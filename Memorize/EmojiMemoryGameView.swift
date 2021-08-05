@@ -11,23 +11,38 @@ struct EmojiMemoryGameView: View {
     @ObservedObject var game: EmojiMemoryGame
     
     var body: some View {
+        VStack{
+            gameBody
+            shuffle
+        }
+        .padding()
+        
+    }
+    
+    var gameBody: some View {
         AspectVGrid(items: game.cards, aspectRatio: 2/3) { card in
             if card.isMatched && !card.isFaceUp {
-                Rectangle().opacity(0)
+                Color.clear
             } else {
                 CardView(card: card)
                     .padding(4)
                     .onTapGesture {
-                        game.choose(card)
+                        withAnimation(.easeInOut(duration: 3)){
+                            game.choose(card)
+                        }
                     }
             }
-            
         }
         .foregroundColor(.red)
-        .padding(.horizontal)
-        
     }
     
+    var shuffle: some View{
+        Button("SHUFFLE"){
+            withAnimation{
+                game.shuffle()
+            }
+        }
+    }
 }
 
 struct CardView: View {
@@ -52,6 +67,7 @@ struct CardView: View {
     private func scale(thatFits size: CGSize) ->CGFloat{
         min(size.width, size.height) / (DrawingConstants.fontSize/DrawingConstants.fontScale)
     }
+    
     private struct DrawingConstants{
         static let fontScale: CGFloat = 0.7
         static let fontSize: CGFloat = 32
